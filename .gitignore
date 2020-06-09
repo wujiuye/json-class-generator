@@ -1,0 +1,23 @@
+### Project
+.gradle
+gradle
+.idea
+.settings
+bin
+build
+out
+.classpath
+.project
+gradlew
+gradlew.bat
+
+### Mac OS
+.DS_Store
+# gradle.properties
+
+# VS Code
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
