@@ -1,5 +1,7 @@
 package com.wujiuye.jcg;
 
+import com.wujiuye.jcg.handler.JsonToClassHandler;
+import com.wujiuye.jcg.tree.AnnotationRuleApplyUtils;
 import com.wujiuye.jcg.tree.JsonClassDefinitionUtils;
 import com.wujiuye.jcg.tree.DynamicClass;
 import com.wujiuye.jcg.util.JcgClassLoader;
@@ -27,9 +29,12 @@ public class JcgClassFactory {
             return codeClassLoader.loadClass(className);
         } catch (ClassNotFoundException e) {
             DynamicClass dynamicClass = JsonClassDefinitionUtils.analysis(className, json);
+            AnnotationRuleApplyUtils.applyAnnotationRule(dynamicClass);
             JsonToClassHandler responseHandler = new JsonToClassHandler(dynamicClass);
             codeClassLoader.add(className, responseHandler);
             return codeClassLoader.loadClass(className);
+        } finally {
+            AnnotationRuleRegister.remove();
         }
     }
 

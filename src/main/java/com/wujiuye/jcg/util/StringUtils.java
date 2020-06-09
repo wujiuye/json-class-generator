@@ -7,6 +7,10 @@ package com.wujiuye.jcg.util;
  */
 public class StringUtils {
 
+    public static boolean isEmpty(String str) {
+        return str == null || str.trim().length() == 0;
+    }
+
     /**
      * 将字符串首字母改为大写
      *

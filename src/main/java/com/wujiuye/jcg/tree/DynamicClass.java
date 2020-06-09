@@ -11,11 +11,13 @@ import java.util.List;
 public class DynamicClass {
 
     private String className;
+    private List<AnnotationNode> annotations;
     private List<FieldNode> fields;
 
     public DynamicClass(String className) {
         this.className = className;
         this.fields = new ArrayList<>();
+        this.annotations = new ArrayList<>();
     }
 
     public void addField(FieldNode fieldNode) {
@@ -28,6 +30,14 @@ public class DynamicClass {
 
     public List<FieldNode> getFields() {
         return fields;
+    }
+
+    public void addAnnotation(AnnotationNode annotation) {
+        this.annotations.add(annotation);
+    }
+
+    public List<AnnotationNode> getAnnotations() {
+        return annotations;
     }
 
 }

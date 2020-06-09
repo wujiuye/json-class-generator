@@ -1,4 +1,4 @@
-package com.wujiuye.jcg;
+package com.wujiuye.jcg.handler;
 
 /**
  * 字节码处理器

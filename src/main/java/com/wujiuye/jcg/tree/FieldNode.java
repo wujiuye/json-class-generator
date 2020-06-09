@@ -1,5 +1,8 @@
 package com.wujiuye.jcg.tree;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * 字段节点
  *
@@ -15,16 +18,19 @@ public class FieldNode {
      * 如果是数组，则rClass表示数组的元素类型
      */
     private boolean array = false;
+    private List<AnnotationNode> annotations;
 
     public FieldNode(String fieldName, Class<?> cls) {
         this.fieldName = fieldName;
         this.cls = cls;
+        this.annotations = new ArrayList<>();
     }
 
     public FieldNode(String fieldName, String fieldClassName, DynamicClass dynamicClass) {
         this.fieldName = fieldName;
         this.claName = fieldClassName;
         this.dynamicClass = dynamicClass;
+        this.annotations = new ArrayList<>();
     }
 
     public void setCls(Class<?> cls) {
@@ -53,6 +59,14 @@ public class FieldNode {
 
     public void setArray(boolean array) {
         this.array = array;
+    }
+
+    public void addAnnotation(AnnotationNode annotation) {
+        this.annotations.add(annotation);
+    }
+
+    public List<AnnotationNode> getAnnotations() {
+        return annotations;
     }
 
 }

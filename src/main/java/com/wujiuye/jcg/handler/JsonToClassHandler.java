@@ -1,12 +1,10 @@
-package com.wujiuye.jcg;
+package com.wujiuye.jcg.handler;
 
+import com.wujiuye.jcg.JcgClassFactory;
 import com.wujiuye.jcg.tree.FieldNode;
 import com.wujiuye.jcg.tree.DynamicClass;
 import com.wujiuye.jcg.util.TypeUtils;
-import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Type;
+import org.objectweb.asm.*;
 
 import java.util.List;
 
@@ -40,6 +38,8 @@ public class JsonToClassHandler implements ClassHandler {
                 // 导致json解析框架解析异常，fastjson报StackOverflowError，gson报：字段重复定义
                 null,
                 Type.getInternalName(Object.class), null);
+        AnnotationHandler annotationHandler = new ClassAnnotionHandler(classWriter, dynamicClass.getAnnotations());
+        annotationHandler.generateAnnotation();
     }
 
     private void generateInitMethod() {
@@ -76,16 +76,19 @@ public class JsonToClassHandler implements ClassHandler {
     private void generateFields() {
         for (FieldNode fieldNode : dynamicClass.getFields()) {
             this.ensureFieldNodeClsExist(fieldNode);
+            FieldVisitor fieldVisitor;
             if (!fieldNode.isArray()) {
                 String fieldSig = Type.getDescriptor(fieldNode.getCls());
-                classWriter.visitField(ACC_PRIVATE, fieldNode.getFieldName(),
+                fieldVisitor = classWriter.visitField(ACC_PRIVATE, fieldNode.getFieldName(),
                         Type.getDescriptor(fieldNode.getCls()), fieldSig, null);
             } else {
                 String fieldSig = "Ljava/util/List<" + Type.getDescriptor(fieldNode.getCls()) + ">;";
-                classWriter.visitField(ACC_PRIVATE, fieldNode.getFieldName(),
+                fieldVisitor = classWriter.visitField(ACC_PRIVATE, fieldNode.getFieldName(),
                         Type.getDescriptor(List.class),
                         fieldSig, null);
             }
+            AnnotationHandler annotationHandler = new FieldAnnotionHandler(fieldVisitor, fieldNode.getAnnotations());
+            annotationHandler.generateAnnotation();
         }
     }
 

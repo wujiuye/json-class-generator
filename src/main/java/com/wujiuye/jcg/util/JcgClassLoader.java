@@ -1,6 +1,6 @@
 package com.wujiuye.jcg.util;
 
-import com.wujiuye.jcg.ClassHandler;
+import com.wujiuye.jcg.handler.ClassHandler;
 
 import java.util.HashMap;
 import java.util.Map;
