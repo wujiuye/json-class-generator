@@ -125,9 +125,9 @@ public class JsonToClassTest {
 ```
 
 注解规则映射类AnnotationRule的构造方法说明：
-参数1：要添加的注解的类型；
-参数2：注解在类上还是字段上，第二个参数和第三个参数需要配和使用。（目前只支持类、字段两个类型）；
-参数3：添加的路径；
+* 参数1：要添加的注解的类型；
+* 参数2：注解在类上还是字段上，第二个参数和第三个参数需要配和使用。（目前只支持类、字段两个类型）；
+* 参数3：添加的路径；
 
 如果参数2为ElementType.TYPE，参数3为""，那么结果就是在json生成的class上添加注解；
 如果参数2为ElementType.FIELD，参数3为""则会报错，如果参数3为"name"，则是在name字段上添加注解；
@@ -135,9 +135,9 @@ public class JsonToClassTest {
 由于nodes字段是一个数组，如果数组元素不是基本数据类型，那么JCG也会为数组元素生成一个class，如果想为nodes
 元素类型对应的class也添加注解，那么可以通过`path`指定。如：
 
-参数2为ElementType.TYPE，参数3为"nodes"，则会在nodes元素对应的类上添加注解；
-参数2为ElementType.FIELD，参数3为"nodes"，则只是在nodes字段上添加注解；
-参数2为ElementType.FIELD，参数3为"nodes.id"，则会在nodes元素对应的类的id字段上添加注解；
+* 参数2为ElementType.TYPE，参数3为"nodes"，则会在nodes元素对应的类上添加注解；
+* 参数2为ElementType.FIELD，参数3为"nodes"，则只是在nodes字段上添加注解；
+* 参数2为ElementType.FIELD，参数3为"nodes.id"，则会在nodes元素对应的类的id字段上添加注解；
 
 ```java
 public class JsonToClassTest {
