@@ -92,7 +92,14 @@ public class AnnotationRuleApplyUtils {
     private static AnnotationNode toNode(AnnotationRule rule) {
         AnnotationNode annotationNode = new AnnotationNode(rule.getAnnoClas());
         if (rule.getAnnoAttrs() != null && rule.getAnnoAttrs().size() > 0) {
-            rule.getAnnoAttrs().entrySet().forEach(entry -> annotationNode.putAttr(entry.getKey(), entry.getValue()));
+            rule.getAnnoAttrs().entrySet().forEach(entry -> {
+                // 解决嵌套问题
+                if (entry.getValue() instanceof AnnotationRule) {
+                    annotationNode.putAttr(entry.getKey(), toNode((AnnotationRule) entry.getValue()));
+                    return;
+                }
+                annotationNode.putAttr(entry.getKey(), entry.getValue());
+            });
         }
         return annotationNode;
     }

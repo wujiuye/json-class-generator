@@ -2,6 +2,7 @@ package com.wujiuye.jcg.handler;
 
 import com.wujiuye.jcg.tree.AnnotationNode;
 import org.objectweb.asm.AnnotationVisitor;
+import org.objectweb.asm.Type;
 
 import java.util.List;
 import java.util.Map;
@@ -26,11 +27,34 @@ public abstract class AnnotationHandler {
         annotations.forEach(annotationNode -> {
             AnnotationVisitor visitor = getVisitor(annotationNode);
             Map<String, Object> attrs = annotationNode.getKeyValue();
-            if (attrs == null || attrs.size() == 0) {
+            this.generateAnnotation(visitor, attrs);
+        });
+    }
+
+    private void generateAnnotation(AnnotationVisitor visitor, Map<String, Object> attrs) {
+        if (attrs == null || attrs.size() == 0) {
+            visitor.visitEnd();
+            return;
+        }
+        attrs.entrySet().forEach(attr -> {
+            // 对AnnotationNode递归解析
+            if (attr.getValue() instanceof AnnotationNode) {
+                AnnotationNode node = (AnnotationNode) attr.getValue();
+                AnnotationVisitor attVisitor = visitor.visitAnnotation(attr.getKey(), Type.getDescriptor(node.getAnnotationClass()));
+                Map<String, Object> attAttrs = node.getKeyValue();
+                this.generateAnnotation(attVisitor, attAttrs);
                 return;
             }
-            attrs.entrySet().forEach(attr -> visitor.visit(attr.getKey(), attr.getValue()));
+            Class<?> cls = attr.getValue().getClass();
+            if (cls.isEnum()) {
+                visitor.visitEnum(attr.getKey(), Type.getDescriptor(cls), attr.getValue().toString());
+            } else if (attr.getValue().getClass().isArray()) {
+                throw new UnsupportedOperationException("暂不支持数组呢！");
+            } else {
+                visitor.visit(attr.getKey(), attr.getValue());
+            }
         });
+        visitor.visitEnd();
     }
 
 }

@@ -46,7 +46,7 @@ publishing {
 
             pom {
                 name = "Json Class Generator"
-                description = "运行时根据json生成class"
+                description = "运行时根据json生成class，支持为生成的class添加注解"
                 url = "https://github.com/wujiuye/json-class-generator"
                 licenses {
                     license {

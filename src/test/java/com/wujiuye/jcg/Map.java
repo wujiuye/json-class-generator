@@ -3,13 +3,8 @@ package com.wujiuye.jcg;
 import java.lang.annotation.*;
 
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.TYPE, ElementType.FIELD})
+@Target({ElementType.ANNOTATION_TYPE})
 @Documented
-public @interface TestAnno {
+public @interface Map {
     String value();
-
-    ElementType type();
-
-    Map map();
-
 }

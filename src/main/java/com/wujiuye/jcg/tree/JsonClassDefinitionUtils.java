@@ -17,6 +17,13 @@ public class JsonClassDefinitionUtils {
     public static DynamicClass analysis(String className, String json) {
         DynamicClass dynamicClass = new DynamicClass(className);
         JsonElement element = new JsonParser().parse(json);
+        if (element.isJsonArray()) {
+            JsonArray array = element.getAsJsonArray();
+            if (array.size() == 0) {
+                throw new RuntimeException("json解析失败，数组至少要有一个元素！");
+            }
+            element = array.get(0);
+        }
         if (!element.isJsonObject()) {
             throw new RuntimeException("json解析失败!");
         }
