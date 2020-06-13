@@ -98,6 +98,21 @@ public class AnnotationRuleApplyUtils {
                     annotationNode.putAttr(entry.getKey(), toNode((AnnotationRule) entry.getValue()));
                     return;
                 }
+                // 数组
+                if (entry.getValue().getClass().isArray()) {
+                    Object[] objs = (Object[]) entry.getValue();
+                    if (objs[0].getClass() == AnnotationRule.class) {
+                        AnnotationRule[] rules = (AnnotationRule[]) entry.getValue();
+                        AnnotationNode[] nodes = new AnnotationNode[rules.length];
+                        for (int i = 0; i < rules.length; i++) {
+                            nodes[i] = toNode(rules[i]);
+                        }
+                        annotationNode.putAttr(entry.getKey(), nodes);
+                    } else {
+                        annotationNode.putAttr(entry.getKey(), entry.getValue());
+                    }
+                    return;
+                }
                 annotationNode.putAttr(entry.getKey(), entry.getValue());
             });
         }

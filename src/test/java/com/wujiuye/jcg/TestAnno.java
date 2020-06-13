@@ -6,10 +6,15 @@ import java.lang.annotation.*;
 @Target({ElementType.TYPE, ElementType.FIELD})
 @Documented
 public @interface TestAnno {
+
     String value();
 
     ElementType type();
 
     Map map();
+
+    Map[] mapArray();
+
+    ElementType[] typeArray();
 
 }
