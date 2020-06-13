@@ -1,5 +1,5 @@
 # JsonClassGenerator
-[![Maven central](https://user-gold-cdn.xitu.io/2020/6/11/172a3531ced621f6?w=182&h=20&f=svg&s=1038)](https://maven-badges.herokuapp.com/maven-central/com.github.wujiuye/json-class-generator)
+[![Maven central](https://user-gold-cdn.xitu.io/2020/6/11/172a3531ced621f6?w=182&h=20&f=svg&s=1038)](https://maven-badges.herokuapp.com/maven-central/com.github.wujiuye/JsonClassGenerator)
 
 `JCG`(`json-class-generator`)是一个可用于运行时根据`json`生成`class`的工具，可能使用场景不多。由于是运行时生成的`class`，所以生成的`class`也只能通过反射去使用。
 
@@ -93,7 +93,7 @@ public class JsonToClassTest {
 
 ## 特色：为生成的class添加注解
 
-为了使用某些框架的特性，我们可能需要在将`json`解析生成`class`时，就需要为`class`添加注解。比如我们想将`JCG`生成的`class`用于后续的`json`解析，那么我们可能需要在`class`上或者字段上添加一些诸如`@JsonIgnore`之类的注解。这些需求`JCG`都可以满足，目前的不足之处是还不支持注解的属性是数组类型。
+为了使用某些框架的特性，我们可能需要在将`json`解析生成`class`时，就需要为`class`添加注解。比如我们想将`JCG`生成的`class`用于后续的`json`解析，那么我们可能需要在`class`上或者字段上添加一些诸如`@JsonIgnore`之类的注解，这些需求`JCG`都可以满足。
 
 假设，我们想在解析`json`生成的`class`上添加一个`@TestAnnno`注解，可以这么实现：
 ```java
@@ -215,3 +215,55 @@ public class TestBean$$Nodes {
 ```
 
 `TestBean$$Nodes`是`JCG`为`json`中的`nodes`字段生成的一个`class`。
+
+## 复杂注解的支持
+
+针对注解属性是数组的玩法比较复杂，`JCG`在`1.0.1`版本开始支持，使用方法如下：
+```java
+/**
+ * @author wujiuye 2020/06/08
+ */
+public class JsonToClassTest {
+
+    static {
+        System.setProperty("jcg.classSavaPath", "/Users/wjy/MyProjects/JsonClassGenerator");
+    }
+
+    @Test
+    public void test2() throws ClassNotFoundException {
+        String json = "{\"name\":\"offer name\",\"price\":1.0,\"nodes\":[{\"id\":222,\"note\":\"xxx\"}]}";
+        String className = "com.wujiuye.jcg.model.OfferBean";
+
+        AnnotationRule fieldRule = new AnnotationRule(TestAnno.class, ElementType.TYPE, "nodes");
+        fieldRule.putAttr("value", "12233");
+
+        // 注解的属性类型为注解数组的写法
+        AnnotationRule[] mapArray = new AnnotationRule[2];
+        AnnotationRule annoRule = new AnnotationRule(Map.class, null, "");
+        annoRule.putAttr("value", "haha");
+        mapArray[0] = annoRule;
+        mapArray[1] = annoRule;
+        fieldRule.putAttr("mapArray", mapArray);
+
+        // 注解的属性类型为枚举数组的写法
+        ElementType[] typeArray = new ElementType[2];
+        typeArray[0] = ElementType.TYPE;
+        typeArray[1] = ElementType.FIELD;
+        fieldRule.putAttr("typeArray", typeArray);
+
+        AnnotationRuleRegister.registRule(className, fieldRule);
+
+        Class<?> cls = JcgClassFactory.getInstance().generateResponseClassByJson(className, json);
+        try {
+            Object obj = new Gson().fromJson(json, cls);
+            System.out.println(obj.getClass());
+            Method method = obj.getClass().getDeclaredMethod("getNodes");
+            Object result = method.invoke(obj);
+            System.out.println(result);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+}
+```

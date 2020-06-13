@@ -44,12 +44,12 @@ public class AnnotationNode {
             }
         }
         // 支持枚举
-        if (value.getClass().isEnum()) {
+        if (vclas.isEnum()) {
             this.keyValue.put(key, value);
             return this;
         }
         // 数组处理
-        if (value.getClass().isArray()) {
+        if (vclas.isArray()) {
             Object[] e = (Object[]) value;
             if (e.length == 0) {
                 return this;
@@ -63,6 +63,10 @@ public class AnnotationNode {
                     this.keyValue.put(key, value);
                     return this;
                 }
+            }
+            if (e[0].getClass() == AnnotationNode.class) {
+                this.keyValue.put(key, value);
+                return this;
             }
         }
         throw new RuntimeException("不支持的类型，注解只支持常量！");

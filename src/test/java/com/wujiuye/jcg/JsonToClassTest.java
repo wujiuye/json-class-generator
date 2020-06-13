@@ -49,4 +49,40 @@ public class JsonToClassTest {
         }
     }
 
+    @Test
+    public void test2() throws ClassNotFoundException {
+        String json = "{\"name\":\"offer name\",\"price\":1.0,\"nodes\":[{\"id\":222,\"note\":\"xxx\"}]}";
+        String className = "com.wujiuye.jcg.model.OfferBean";
+
+        AnnotationRule fieldRule = new AnnotationRule(TestAnno.class, ElementType.TYPE, "nodes");
+        fieldRule.putAttr("value", "12233");
+
+        // 注解的属性类型为注解数组的写法
+        AnnotationRule[] mapArray = new AnnotationRule[2];
+        AnnotationRule annoRule = new AnnotationRule(Map.class, null, "");
+        annoRule.putAttr("value", "haha");
+        mapArray[0] = annoRule;
+        mapArray[1] = annoRule;
+        fieldRule.putAttr("mapArray", mapArray);
+
+        // 注解的属性类型为枚举数组的写法
+        ElementType[] typeArray = new ElementType[2];
+        typeArray[0] = ElementType.TYPE;
+        typeArray[1] = ElementType.FIELD;
+        fieldRule.putAttr("typeArray", typeArray);
+
+        AnnotationRuleRegister.registRule(className, fieldRule);
+
+        Class<?> cls = JcgClassFactory.getInstance().generateResponseClassByJson(className, json);
+        try {
+            Object obj = new Gson().fromJson(json, cls);
+            System.out.println(obj.getClass());
+            Method method = obj.getClass().getDeclaredMethod("getNodes");
+            Object result = method.invoke(obj);
+            System.out.println(result);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 }

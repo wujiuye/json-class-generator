@@ -49,7 +49,22 @@ public abstract class AnnotationHandler {
             if (cls.isEnum()) {
                 visitor.visitEnum(attr.getKey(), Type.getDescriptor(cls), attr.getValue().toString());
             } else if (attr.getValue().getClass().isArray()) {
-                throw new UnsupportedOperationException("暂不支持数组呢！");
+                AnnotationVisitor arrayVisitor = visitor.visitArray(attr.getKey());
+                Object[] objects = (Object[]) attr.getValue();
+                for (Object obj : objects) {
+                    // 数组元素类型是注解
+                    if (obj instanceof AnnotationNode) {
+                        AnnotationNode node = (AnnotationNode) obj;
+                        AnnotationVisitor attVisitor = arrayVisitor.visitAnnotation(attr.getKey(), Type.getDescriptor(node.getAnnotationClass()));
+                        Map<String, Object> attAttrs = node.getKeyValue();
+                        this.generateAnnotation(attVisitor, attAttrs);
+                    } else if (obj.getClass().isEnum()) {
+                        arrayVisitor.visitEnum(null, Type.getDescriptor(obj.getClass()), obj.toString());
+                    } else {
+                        arrayVisitor.visit(null, obj);
+                    }
+                }
+                arrayVisitor.visitEnd();
             } else {
                 visitor.visit(attr.getKey(), attr.getValue());
             }
