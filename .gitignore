@@ -21,3 +21,5 @@ gradlew.bat
 *.ntvs*
 *.njsproj
 *.sln
+
+gradle.properties
