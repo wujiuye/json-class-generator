@@ -25,6 +25,19 @@ public class JsonToClassTest {
 }
 ```
 
+默认情况下，当`JSON`有字段为`null`时则会解析失败，如果这些字段不是必须的，那么我们可以通过以下配置让`JCG`忽略这些字段：
+```java
+public class JsonToClassTest {
+
+    static {
+         /**
+          * 是否忽略空字段，默认为false
+          */
+        System.setProperty("jcg.ignore_null_field", "true");
+    }
+}
+```
+
 既然要用到动态`json`解析生成`class`，那么说明`json`我们是通过`API`或者读取数据库获取的。为了简单，我们就直接定义`json`字符串来测试了。
 
 假设`json`为：

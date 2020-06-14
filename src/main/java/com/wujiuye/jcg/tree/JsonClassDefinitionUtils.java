@@ -4,6 +4,7 @@ import com.google.gson.*;
 import com.wujiuye.jcg.util.StringUtils;
 
 import java.math.BigDecimal;
+import java.util.Optional;
 
 /**
  * 将json解析为类定义元数据
@@ -11,6 +12,15 @@ import java.math.BigDecimal;
  * @author wujiuye 2020/06/08
  */
 public class JsonClassDefinitionUtils {
+
+    /**
+     * 是否忽略空字段
+     */
+    private static boolean IGNORE_NULL_FIELD;
+
+    static {
+        IGNORE_NULL_FIELD = Boolean.getBoolean("jcg.ignore_null_field");
+    }
 
     private final static String INNER_CLASS_NAME_SPL = "$$";
 
@@ -28,22 +38,26 @@ public class JsonClassDefinitionUtils {
             throw new RuntimeException("json解析失败!");
         }
         JsonObject jsonObj = element.getAsJsonObject();
-        jsonObj.entrySet().forEach(el -> dynamicClass.addField(analysisElement(className, el.getKey(), el.getValue())));
+        jsonObj.entrySet().forEach(el -> analysisElement(className, el.getKey(), el.getValue())
+                .ifPresent(dynamicClass::addField));
         return dynamicClass;
     }
 
-    private static FieldNode analysisElement(String className, String name, JsonElement value) {
+    private static Optional<FieldNode> analysisElement(String className, String name, JsonElement value) {
         FieldNode fieldNode = null;
         if (value.isJsonPrimitive()) {
             JsonPrimitive primitive = value.getAsJsonPrimitive();
             fieldNode = analysisElement(name, primitive);
         } else if (value.isJsonObject()) {
             String innerClass = className + INNER_CLASS_NAME_SPL + StringUtils.fistCharToUpperCase(name);
-            fieldNode = new FieldNode(name, innerClass, analysis(innerClass, value.getAsString()));
+            fieldNode = new FieldNode(name, innerClass, analysis(innerClass, value.toString()));
         } else if (value.isJsonArray()) {
             JsonArray array = value.getAsJsonArray();
             if (array.size() == 0) {
-                throw new RuntimeException("数组为空，解析不了！");
+                if (!IGNORE_NULL_FIELD) {
+                    throw new RuntimeException("数组为空，解析不了！");
+                }
+                return Optional.empty();
             }
             JsonElement one = array.get(0);
             if (one.isJsonPrimitive()) {
@@ -52,13 +66,15 @@ public class JsonClassDefinitionUtils {
                 String innerClass = className + INNER_CLASS_NAME_SPL + StringUtils.fistCharToUpperCase(name);
                 fieldNode = new FieldNode(name, innerClass, analysis(innerClass, one.toString()));
             } else {
-                throw new RuntimeException("暂不支持数组嵌套！或数组元素为空！");
+                throw new RuntimeException("暂不支持数组嵌套！");
             }
             fieldNode.setArray(true);
         } else if (value.isJsonNull()) {
-            throw new RuntimeException("不要在json中写null值，无法解析null的类型！");
+            if (!IGNORE_NULL_FIELD) {
+                throw new RuntimeException("不要在json中写null值，无法解析null的类型！如果运行忽略null字段，可设置jcg.ignore_null_field=true!");
+            }
         }
-        return fieldNode;
+        return Optional.ofNullable(fieldNode);
     }
 
     private static FieldNode analysisElement(String name, JsonPrimitive value) {

@@ -16,7 +16,7 @@ public class ClassFileUtils {
 
     static {
         CLASS_SAVA_PATH = System.getProperty("jcg.classSavaPath", null);
-        if (!CLASS_SAVA_PATH.endsWith("/")) {
+        if (CLASS_SAVA_PATH != null && !CLASS_SAVA_PATH.endsWith("/")) {
             CLASS_SAVA_PATH = CLASS_SAVA_PATH + "/";
         }
     }

@@ -28,7 +28,11 @@ public class JcgClassLoader extends ClassLoader {
         ClassHandler handler = classes.get(name);
         if (handler != null) {
             byte[] bytes = handler.getByteCode();
-            ClassFileUtils.savaToClasspath(handler.getClassName(), bytes);
+            try {
+                ClassFileUtils.savaToClasspath(handler.getClassName(), bytes);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             return defineClass(name, bytes, 0, bytes.length);
         }
         return super.findClass(name);
